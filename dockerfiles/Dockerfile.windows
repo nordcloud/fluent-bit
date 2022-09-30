@@ -5,10 +5,20 @@ ARG WINDOWS_VERSION=ltsc2019
 # Builder Image - Windows Server Core
 FROM mcr.microsoft.com/windows/servercore:$WINDOWS_VERSION as builder
 
+ENV OPENSSL_VERSION 1.1.0.60000000
+ENV chocolateyUseWindowsCompression false
+
 RUN setx /M PATH "%PATH%;C:\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\WinFlexBison"
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 WORKDIR /local
+
+RUN iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')); `
+    choco feature disable --name showDownloadProgress ; `
+    choco install -y openssl;`
+    New-Item -Path /src/build -Name openssl -ItemType directory;`
+    Copy-Item -Recurse -Path '/Program Files/OpenSSL-Win64/*' -Destination /src/build/openssl;`
+    Get-Item '/src/build/openssl/*';
 
 # Install Visual Studio 2019
 ADD https://aka.ms/vs/16/release/vs_buildtools.exe /local/vs_buildtools.exe
@@ -42,7 +52,7 @@ RUN Start-Process /local/vc_redist.x64.exe -ArgumentList '/install', '/quiet', '
 WORKDIR /src/build
 COPY . /src/
 
-RUN cmake -G "'Visual Studio 16 2019'" -DCMAKE_BUILD_TYPE=Release ../; `
+RUN cmake -G "'Visual Studio 16 2019'" -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR="openssl" ../; `
     cmake --build . --config Release;
 
 # Set up config files and binaries in single /fluent-bit hierarchy for easy copy in later stage
@@ -68,17 +78,7 @@ ARG IMAGE_SOURCE_REVISION
 
 # Metadata as defined in OCI image spec annotations
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
-LABEL org.opencontainers.image.title="Fluent Bit" `
-      org.opencontainers.image.description="Fluent Bit is an open source and multi-platform Log Processor and Forwarder which allows you to collect data/logs from different sources, unify and send them to multiple destinations. It's fully compatible with Docker and Kubernetes environments." `
-      org.opencontainers.image.created=$IMAGE_CREATE_DATE `
-      org.opencontainers.image.version=$FLUENTBIT_VERSION `
-      org.opencontainers.image.authors="Eduardo Silva <eduardo@calyptia.com>" `
-      org.opencontainers.image.url="https://hub.docker.com/r/fluent/fluent-bit" `
-      org.opencontainers.image.documentation="https://docs.fluentbit.io/manual/" `
-      org.opencontainers.image.vendor="Fluent Organization" `
-      org.opencontainers.image.licenses="Apache-2.0" `
-      org.opencontainers.image.source="https://github.com/fluent/fluent-bit" `
-      org.opencontainers.image.revision=$IMAGE_SOURCE_REVISION
+LABEL org.opencontainers.image.source="https://github.com/nordcloud/fluent-bit"
 
 COPY --from=builder /fluent-bit /fluent-bit
 
