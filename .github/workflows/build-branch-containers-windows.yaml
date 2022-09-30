@@ -16,8 +16,8 @@ jobs:
       version: "1.0"
       ref: ${{ github.event.inputs.version }}
       registry: ghcr.io
-      username: ${{ github.actor }}
+      username:  nordcloud  #${{ github.actor }}
       image: ${{ github.repository }} # /windows/${{ github.event.inputs.version }}
       # unstable: ${{ github.event.inputs.version }}
     secrets:
-      token: ${{ github.token }}
+      token: ${{secrets.GITHUB_TOKEN}}    #${{ github.token }}
