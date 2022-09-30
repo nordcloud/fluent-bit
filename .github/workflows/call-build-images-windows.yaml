@@ -99,16 +99,16 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ inputs.registry }}
-          username: ${{ inputs.username }}
-          password: ${{ secrets.token }}
+      #- name: Log in to the Container registry
+      #  uses: docker/login-action@v2
+      #  with:
+      #    registry: ${{ inputs.registry }}
+      #    username: ${{ inputs.username }}
+      #    password: ${{ secrets.token }}
 
       - name: Build the production images
         run: |
-          docker login ${{ inputs.registry }} --username=${{ inputs.username }} --password=${{ secrets.token }}
+          printf '%s' "${{ secrets.token }}" | docker login ${{ inputs.registry }} --username ${{ inputs.username }} --password-stdin
           docker build --tag ${{ inputs.registry }}/${{ inputs.image }}:windows-2019-${{ inputs.version }}  -f ./dockerfiles/Dockerfile.windows .
           docker push ${{ inputs.registry }}/${{ inputs.image }}:windows-2019-${{ inputs.version }}
 
