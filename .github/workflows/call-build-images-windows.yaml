@@ -108,7 +108,7 @@ jobs:
 
       - name: Build the production images
         run: |
-          printf '%s' "${{ secrets.token }}" | docker login ${{ inputs.registry }} --username ${{ inputs.username }} --password-stdin
+          printf '%s\n' "${{ secrets.token }}" | docker login ${{ inputs.registry }} --username ${{ inputs.username }} --password-stdin
           docker build --tag ${{ inputs.registry }}/${{ inputs.image }}:windows-2019-${{ inputs.version }}  -f ./dockerfiles/Dockerfile.windows .
           docker push ${{ inputs.registry }}/${{ inputs.image }}:windows-2019-${{ inputs.version }}
 
