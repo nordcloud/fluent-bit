@@ -2,7 +2,7 @@ name: Build containers for a specific branch
 on:
   push:
     branches:
-      - deploy-windows-container
+      - windows-image
   workflow_dispatch:
     inputs:
       version: 
