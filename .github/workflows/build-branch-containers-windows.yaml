@@ -13,11 +13,11 @@ jobs:
   build-branch-containers:
     uses: nordcloud/fluent-bit/.github/workflows/call-build-images-windows.yaml@windows-image
     with:
-      version: ${{ github.event.inputs.version }}
+      version: "1.0"
       ref: ${{ github.event.inputs.version }}
       registry: ghcr.io
       username: ${{ github.actor }}
-      image: ${{ github.repository }}/test/${{ github.event.inputs.version }}
-      unstable: ${{ github.event.inputs.version }}
+      image: ${{ github.repository }}
+      #unstable: ${{ github.event.inputs.version }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
