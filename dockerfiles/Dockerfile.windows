@@ -84,7 +84,11 @@ COPY --from=builder /fluent-bit /fluent-bit
 
 RUN setx /M PATH "%PATH%;C:\fluent-bit\bin"
 
-ENTRYPOINT [ "C:\fluent-bit\bin\fluent-bit.exe" ]
+# ENTRYPOINT [ "C:\fluent-bit\bin\fluent-bit.exe" ]
+# ENTRYPOINT [ "powershell.exe" ]
+
 # Hadolint gets confused by Windows it seems
 # hadolint ignore=DL3025
-CMD [ "C:\fluent-bit\bin\fluent-bit.exe", "-c", "C:\fluent-bit\etc\fluent-bit.conf" ]
+# CMD [ "C:\fluent-bit\bin\fluent-bit.exe", "-c", "C:\fluent-bit\etc\fluent-bit.conf" ]
+CMD [ "C:\\fluent-bit\\bin\\fluent-bit.exe", "-c", "C:\\fluent-bit\\etc\\fluent-bit.conf" ]
+
